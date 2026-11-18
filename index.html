@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinguaQuest Pro - النطق المباشر للكروم</title>
+    <title>LinguaQuest Pro - النسخة النهائية المحدثة</title>
     <style>
         :root {
             --primary: #58cc02;
@@ -203,7 +203,7 @@
             text-align: center;
         }
 
-        .option-btn:hover { background: #f0f8ff; border-color: var(--secondary); }
+        .option-btn.hover { background: #f0f8ff; border-color: var(--secondary); }
         .option-btn.correct { background: #d7ffb8 !important; border-color: var(--primary) !important; color: var(--primary-dark); }
         .option-btn.wrong { background: #ffdfe0 !important; border-color: var(--danger) !important; color: var(--danger); }
 
@@ -278,9 +278,8 @@
         </div>
 
         <div class="question-box">
-            <div style="color: #888; font-size: 0.9rem;">اضغط للاستماع للفظ الصحيح ثم اختر المعنى:</div>
+            <div style="color: #888; font-size: 0.9rem;">اختر المعنى الصحيح للكلمة:</div>
             <div class="target-word" id="word-display">Hello</div>
-            <!-- مشغل صوتي مباشر متوافق مع قيود كروم الحديثة -->
             <button class="speak-btn" onclick="playAudioDirect()">🔊 استمع للفظ الصحيح</button>
         </div>
 
@@ -318,7 +317,7 @@
             { ar: "أريد حجز غرفة إضافية", en: "I want to book an extra room", fr: "Je veux réserver une chambre supplémentaire", es: "Quiero reservar una habitación extra", de: "Ich möchte ein zusätzliches Zimmer buchen" },
             { ar: "كم تبلغ تكلفة التذكرة؟", en: "How much is the ticket?", fr: "Combien coûte le billet ?", es: "¿Cuánto cuesta el boleto?", de: "Wie viel kostet das Ticket?" },
             { ar: "حقائبي ضاعت في المطار", en: "My luggage is lost at the airport", fr: "Mes bagages sont perdus à l'aéroport", es: "Mi equipaje se ha perdido en el aeropuerto", de: "Mein Gepäck ist am Flughafen verloren gegangen" },
-            { ar: "أين أقرب صراف آلي؟", en: "Where is the nearest ATM?", fr: "Où est le distributeur automatique le plus proche ?", es: "¿Dónde está le cajero automático más cercano?", de: "Wo ist der nächste Geldautomat?" }
+            { ar: "أين أقرب صراف آلي؟", en: "Where is the nearest ATM?", fr: "Où est le distributeur automatique le plus proche ?", es: "¿Dónde está el cajero automático más cercano?", de: "Wo ist der nächste Geldautomat?" }
         ],
         business: [
             { ar: "لقد وقعنا عقداً ناجحاً", en: "We signed a successful contract", fr: "Nous avons signé un contrat réussi", es: "Firmamos un contrato exitoso", de: "Wir haben einen erfolgreichen Vertrag unterzeichnet" },
@@ -326,7 +325,7 @@
             { ar: "تطوير تطبيق الهاتف المحمول", en: "Developing the mobile application", fr: "Développement de l'application mobile", es: "Desarrollo de la aplicación móvil", de: "Entwicklung der mobilen Anwendung" }
         ],
         emotions: [
-            { ar: "أنا متحمس جداً لهذا المشروع", en: "I am very excited about this project", fr: "Je suis très excité par ce projet", es: "Estoy muy emocionado por este proyecto", de: "Ich freue mich sehr auf dieses Projekt" },
+            { ar: "أنا متحمس جداً لهذا المشروع", en: "I am very excited about this project", fr: "Je suis très excité par ce projet", es: "Estoy muy emocionado por هذا المشروع", de: "Ich freue mich sehr auf dieses Projekt" },
             { ar: "لا تقلق، كل شيء تحت السيطرة", en: "Don't worry, everything is under control", fr: "Ne vous inquiétez pas, tout est sous contrôle", es: "No te preocupes, todo está bajo control", de: "Keine Sorge, alles ist unter Kontrolle" },
             { ar: "هذا أمر مذهل حقاً!", en: "This is truly amazing!", fr: "C'est vraiment incroyable !", es: "¡Esto es verdaderamente increíble!", de: "Das ist wirklich erstaunlich!" }
         ]
@@ -341,16 +340,158 @@
     let hearts = 3;
     let canAnswer = true;
 
-    // دالة صوتية مباشرة تتجاوز قيود كروم عبر جلب تدفق صوتي موثوق عند الضغط البشري
     function playAudioDirect() {
         const currentQ = questions[currentIndex];
+        if (!currentQ) return;
         const text = currentQ[targetLang] || currentQ.en;
         const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${targetLang}&client=tw-ob`);
         audio.play().catch(err => {
-            // كخيار احتياطي فوري إذا احتجز الكروم الملف، نشغل نغمة تنبيهية مؤكدة لكي لا يتعطل المستخدم
             playFallbackTone();
         });
     }
 
     function playFallbackTone() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.2);
+        } catch(e) {}
+    }
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function updateStats() {
+        document.getElementById('xp-count').innerText = xp;
+        document.getElementById('hearts-display').innerText = '❤️'.repeat(hearts) + '🖤'.repeat(3 - hearts);
+    }
+
+    function startGame() {
+        const nativeEl = document.getElementById('native-lang');
+        const targetEl = document.getElementById('target-lang');
+        const catEl = document.getElementById('category-select');
+
+        nativeLang = nativeEl ? nativeEl.value : 'ar';
+        targetLang = targetEl ? targetEl.value : 'en';
+        currentCategory = catEl ? catEl.value : 'basics';
+
+        // تصحيح ذكي تلقائي: إذا اختار المستخدم نفس اللغة بالخطأ، يتم تعديل لغة التعلم لتصبح الإنجليزية
+        if (nativeLang === targetLang) {
+            targetLang = (nativeLang === 'ar') ? 'en' : 'ar';
+        }
+
+        hearts = 3;
+        currentIndex = 0;
+        questions = [...(curriculum[currentCategory] || curriculum.basics)].sort(() => Math.random() - 0.5);
+        updateStats();
+        switchScreen('quiz-screen');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        canAnswer = true;
+        document.getElementById('feedback-msg').innerText = '';
         
+        const progress = (currentIndex / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = progress + '%';
+
+        const currentQ = questions[currentIndex];
+        const wordEl = document.getElementById('word-display');
+        wordEl.innerText = currentQ[targetLang] || currentQ.en;
+        wordEl.style.direction = targetLang === 'ar' ? 'rtl' : 'ltr';
+
+        const allItems = curriculum[currentCategory] || curriculum.basics;
+        let distractors = allItems
+            .filter(item => item[nativeLang] !== currentQ[nativeLang])
+            .map(item => item[nativeLang])
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3);
+
+        let options = [...distractors, currentQ[nativeLang]].sort(() => Math.random() - 0.5);
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt === currentQ[nativeLang], currentQ[nativeLang]);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(btn, isCorrect, correctAnswer) {
+        if (!canAnswer) return;
+        canAnswer = false;
+
+        const feedback = document.getElementById('feedback-msg');
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            playFallbackTone();
+            xp += 15;
+            feedback.style.color = 'var(--primary-dark)';
+            feedback.innerText = '✅ أحسنت! إجابة صحيحة (+15 XP)';
+        } else {
+            btn.classList.add('wrong');
+            hearts--;
+            feedback.style.color = 'var(--danger)';
+            feedback.innerText = '❌ خطأ! الصحيح: ' + correctAnswer;
+        }
+
+        updateStats();
+
+        setTimeout(() => {
+            if (hearts <= 0) {
+                endGame(false);
+            } else if (currentIndex + 1 < questions.length) {
+                currentIndex++;
+                loadQuestion();
+            } else {
+                endGame(true);
+            }
+        }, 1800);
+    }
+
+    function endGame(won) {
+        document.getElementById('progress-bar').style.width = '100%';
+        switchScreen('result-screen');
+        const rewardBtn = document.getElementById('reward-btn');
+
+        if (won) {
+            document.getElementById('result-emoji').innerText = '🏆';
+            document.getElementById('result-title').innerText = 'مذهل! أتممت بنك المعلومات باحترافية';
+            document.getElementById('result-desc').innerText = `رصيدك الإجمالي الآن: ${xp} نقطة خبرة (XP)`;
+            rewardBtn.style.display = 'none';
+        } else {
+            document.getElementById('result-emoji').innerText = '💔';
+            document.getElementById('result-title').innerText = 'انتهت قلوبك!';
+            document.getElementById('result-desc').innerText = 'شاهد إعلاناً قصيراً لاستعادة طاقتك والمتابعة.';
+            rewardBtn.style.display = 'block';
+        }
+    }
+
+    function watchAdForHeart() {
+        alert("🎬 [محاكاة الإعلان]: تم عرض فيديو قصير بنجاح! تم استعادة قلبك.");
+        hearts = 1;
+        updateStats();
+        switchScreen('quiz-screen');
+        loadQuestion();
+    }
+
+    function resetToMenu() {
+        switchScreen('setup-screen');
+    }
+</script>
+
+</body>
+</html>
