@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinguaQuest Pro - بنك المعلومات الضخم</title>
+    <title>LinguaQuest Pro - النسخة النهائية المستقرة</title>
     <style>
         :root {
             --primary: #58cc02;
@@ -278,9 +278,10 @@
         </div>
 
         <div class="question-box">
-            <div style="color: #888; font-size: 0.9rem;">استمع للفظ الصحيح ثم اختر المعنى:</div>
+            <div style="color: #888; font-size: 0.9rem;">اضغط للاستماع للفظ الصحيح ثم اختر المعنى:</div>
             <div class="target-word" id="word-display">Hello</div>
-            <button class="speak-btn" onclick="playAudioPronunciation()">🔊 استمع للفظ الصحيح</button>
+            <!-- تم استخدام محرك متصفح الهاتف المدمج الآمن -->
+            <button class="speak-btn" onclick="speakNativeWord()">🔊 استمع للفظ الصحيح</button>
         </div>
 
         <div class="options-grid" id="options-container"></div>
@@ -300,7 +301,6 @@
 </div>
 
 <script>
-    // بنك معلومات ضخم جداً ومتنوع للغات الخمس (العربية، الإنجليزية، الفرنسية، الإسبانية، الألمانية)
     const curriculum = {
         basics: [
             { ar: "مرحباً بك", en: "Welcome", fr: "Bienvenue", es: "Bienvenido", de: "Willkommen" },
@@ -311,38 +311,28 @@
             { ar: "ما اسمك؟", en: "What is your name?", fr: "Comment vous appelez-vous ?", es: "¿Cómo te llamas?", de: "Wie heißt du?" },
             { ar: "تشرفت بمعرفتك", en: "Nice to meet you", fr: "Enchanté de faire votre connaissance", es: "Mucho gusto en conocerte", de: "Freut mich, dich kennenzulernen" },
             { ar: "إلى اللقاء غداً", en: "See you tomorrow", fr: "À demain", es: "Hasta mañana", de: "Bis morgen" },
-            { ar: "مع السلامة", en: "Goodbye", fr: "Au revoir", es: "Adiós", de: "Auf Wiedersehen" },
-            { ar: "نعم، أوافق", en: "Yes, I agree", fr: "Oui, je suis d'accord", es: "Sí, estoy de acuerdo", de: "Ja, ich stimme zu" },
-            { ar: "لا، شكراً لك", en: "No, thank you", fr: "Non, merci", es: "No, gracias", de: "Nein, danke" },
-            { ar: "من فضلك", en: "Please", fr: "S'il vous plaît", es: "Por favor", de: "Bitte" }
+            { ar: "مع السلامة", en: "Goodbye", fr: "Au revoir", es: "Adiós", de: "Auf Wiedersehen" }
         ],
         travel: [
             { ar: "أين تقع محطة القطار؟", en: "Where is the train station?", fr: "Où est la gare ?", es: "¿Dónde está la estación de tren?", de: "Wo ist der Bahnhof?" },
             { ar: "أريد حجز غرفة إضافية", en: "I want to book an extra room", fr: "Je veux réserver une chambre supplémentaire", es: "Quiero reservar una habitación extra", de: "Ich möchte ein zusätzliches Zimmer buchen" },
             { ar: "كم تبلغ تكلفة التذكرة؟", en: "How much is the ticket?", fr: "Combien coûte le billet ?", es: "¿Cuánto cuesta el boleto?", de: "Wie viel kostet das Ticket?" },
             { ar: "حقائبي ضاعت في المطار", en: "My luggage is lost at the airport", fr: "Mes bagages sont perdus à l'aéroport", es: "Mi equipaje se ha perdido en el aeropuerto", de: "Mein Gepäck ist am Flughafen verloren gegangen" },
-            { ar: "هل توجد طائرة مباشرة؟", en: "Is there a direct flight?", fr: "Y a-t-il un vol direct ?", es: "¿Hay un vuelo directo?", de: "Gibt es einen Direktflug?" },
-            { ar: "أين أقرب صراف آلي؟", en: "Where is the nearest ATM?", fr: "Où est le distributeur automatique le plus proche ?", es: "¿Dónde está el cajero automático más cercano?", de: "Wo ist der nächste Geldautomat?" },
-            { ar: "أريد تذكرة ذهاب وإياب", en: "I want a round-trip ticket", fr: "Je veux un billet aller-retour", es: "Quiero un boleto de ida y vuelta", de: "Ich möchte ein Hin- und Rückfahrtticket" },
-            { ar: "ما هو كلمة المرور للواي فاي؟", en: "What is the Wi-Fi password?", fr: "Quel est le mot de passe du Wi-Fi ?", es: "¿Cuál es la contraseña del Wi-Fi?", de: "Wie ist das WLAN-Passwort?" }
+            { ar: "أين أقرب صراف آلي؟", en: "Where is the nearest ATM?", fr: "Où est le distributeur automatique le plus proche ?", es: "¿Dónde está el cajero automático más cercano?", de: "Wo ist der nächste Geldautomat?" }
         ],
         business: [
             { ar: "لقد وقعنا عقداً ناجحاً", en: "We signed a successful contract", fr: "Nous avons signé un contrat réussi", es: "Firmamos un contrato exitoso", de: "Wir haben einen erfolgreichen Vertrag unterzeichnet" },
-            { ar: "اجتماعنا القادم غداً صباحاً", en: "Our next meeting is tomorrow morning", fr: "Notre prochaine réunion est demain matin", es: "Nuestra próxima reunión es mañana por la mañana", de: "Unser Nächstes Treffen ist morgen früh" },
-            { ar: "نحتاج إلى تحليل قاعدة البيانات", en: "We need to analyze the database", fr: "Nous devons analyser la base de données", es: "Necesitamos analizar la base de datos", de: "Wir müssen die Datenbank analysieren" },
-            { ar: "تطوير تطبيق الهاتف المحمول", en: "Developing the mobile application", fr: "Développement de l'application mobile", es: "Desarrollo de la aplicación móvil", de: "Entwicklung der mobilen Anwendung" },
-            { ar: "زيادة الأرباح الشهرية", en: "Increasing monthly profits", fr: "Augmentation des bénéfices mensuels", es: "Aumento de las ganancias mensuales", de: "Steigerung des monatlichen Gewinns" },
-            { ar: "إدارة فريق العمل بكفاءة", en: "Managing the work team efficiently", fr: "Gérer l'équipe de travail efficacement", es: "Gestionar el equipo de trabajo de manera eficiente", de: "Das Arbeitsteam effizient managen" }
+            { ar: "اجتماعنا القادم غداً صباحاً", en: "Our next meeting is tomorrow morning", fr: "Notre prochaine réunion est demain matin", es: "Nuestra próxima reunión es mañana por la mañana", de: "Unser nächstes Treffen ist morgen früh" },
+            { ar: "تطوير تطبيق الهاتف المحمول", en: "Developing the mobile application", fr: "Développement de l'application mobile", es: "Desarrollo de la aplicación móvil", de: "Entwicklung der mobilen Anwendung" }
         ],
         emotions: [
             { ar: "أنا متحمس جداً لهذا المشروع", en: "I am very excited about this project", fr: "Je suis très excité par ce projet", es: "Estoy muy emocionado por este proyecto", de: "Ich freue mich sehr auf dieses Projekt" },
             { ar: "لا تقلق، كل شيء تحت السيطرة", en: "Don't worry, everything is under control", fr: "Ne vous inquiétez pas, tout est sous contrôle", es: "No te preocupes, todo está bajo control", de: "Keine Sorge, alles ist unter Kontrolle" },
-            { ar: "هذا أمر مذهل حقاً!", en: "This is truly amazing!", fr: "C'est vraiment incroyable !", es: "¡Esto es verdaderamente increíble!", de: "Das ist wirklich erstaunlich!" },
-            { ar: "أنا سعيد برؤيتك اليوم", en: "I am happy to see you today", fr: "Je suis heureux de vous voir aujourd'hui", es: "Me alegra verte hoy", de: "Ich freue mich, dich heute zu sehen" },
-            { ar: "أحتاج إلى بعض القهوة", en: "I need some coffee", fr: "J'ai besoin d'un peu de café", es: "Necesito un poco de café", de: "Ich brauche etwas Kaffee" },
-            { ar: "الوقت يناسبني تماماً", en: "The time suits me perfectly", fr: "L'heure me convient parfaitement", es: "El tiempo me conviene perfectamente", de: "Die Zeit passt perfekt für mich" }
+            { ar: "هذا أمر مذهل حقاً!", en: "This is truly amazing!", fr: "C'est vraiment incroyable !", es: "¡Esto es verdaderamente increíble!", de: "Das ist wirklich erstaunlich!" }
         ]
     };
+
+    const speechCodes = { ar: 'ar-SA', en: 'en-US', fr: 'fr-FR', es: 'es-ES', de: 'de-DE' };
 
     let nativeLang = 'ar';
     let targetLang = 'en';
@@ -353,14 +343,23 @@
     let hearts = 3;
     let canAnswer = true;
 
-    function playAudioPronunciation() {
-        const currentQ = questions[currentIndex];
-        const textToSpeak = currentQ[targetLang] || currentQ.en;
-        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(textToSpeak)}&tl=${targetLang}&client=tw-ob`;
-        const audio = new Audio(audioUrl);
-        audio.play().catch(e => {
-            alert("تعذر تشغيل الصوت، يرجى التأكد من الاتصال بالإنترنت.");
-        });
+    // دالة نطق باستخدام محرك المتصفح المدمج الآمن تماماً
+    function speakNativeWord() {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.resume();
+            window.speechSynthesis.cancel();
+            
+            const currentQ = questions[currentIndex];
+            const textToSpeak = currentQ[targetLang] || currentQ.en;
+            
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = speechCodes[targetLang] || 'en-US';
+            utterance.rate = 0.9;
+            
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("خاصية النطق غير متوفرة في هذا المتصفح.");
+        }
     }
 
     function playBeep(freq, duration, type = 'sine') {
@@ -412,7 +411,6 @@
 
         hearts = 3;
         currentIndex = 0;
-        // خلط الأسئلة عشوائياً لضمان تنوع غير محدود في كل مرة تلعب فيها
         questions = [...(curriculum[currentCategory] || curriculum.basics)].sort(() => Math.random() - 0.5);
         updateStats();
         switchScreen('quiz-screen');
@@ -430,8 +428,6 @@
         const wordEl = document.getElementById('word-display');
         wordEl.innerText = currentQ[targetLang] || currentQ.en;
         wordEl.style.direction = targetLang === 'ar' ? 'rtl' : 'ltr';
-
-        setTimeout(() => playAudioPronunciation(), 400);
 
         const allItems = curriculum[currentCategory] || curriculum.basics;
         let distractors = allItems
