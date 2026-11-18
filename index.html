@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinguaQuest Pro - بنك المعلومات الضخم</title>
+    <style>
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --secondary: #1cb0f6;
+            --danger: #ff4b4b;
+            --warning: #ffc800;
+            --bg: #f7f9fa;
+            --card: #ffffff;
+            --text: #3c3c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .app-container {
+            background: var(--card);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 2px solid #e5e5e5;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #fff;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .stat-xp { color: var(--warning); }
+        .stat-hearts { color: var(--danger); letter-spacing: 2px; }
+
+        .screen {
+            padding: 25px 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 2px solid #e5e5e5;
+            font-size: 1rem;
+            background: #fff;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            background: var(--primary);
+            box-shadow: 0 4px 0 var(--primary-dark);
+            cursor: pointer;
+            transition: all 0.1s;
+            margin-top: 10px;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            box-shadow: 0 4px 0 #1899d6;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background: #e5e5e5;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 25px 15px;
+            border-radius: 16px;
+            border: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .target-word {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 10px 0;
+            direction: ltr;
+        }
+
+        .speak-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            box-shadow: 0 4px 0 #1899d6;
+        }
+
+        .speak-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            padding: 14px;
+            background: #fff;
+            border: 2px solid #e5e5e5;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .option-btn:hover { background: #f0f8ff; border-color: var(--secondary); }
+        .option-btn.correct { background: #d7ffb8 !important; border-color: var(--primary) !important; color: var(--primary-dark); }
+        .option-btn.wrong { background: #ffdfe0 !important; border-color: var(--danger) !important; color: var(--danger); }
+
+        .feedback-msg {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 30px;
+        }
+
+        .result-box {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .result-emoji { font-size: 4rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="top-bar">
+        <div class="stat-xp">⚡ <span id="xp-count">0</span> XP</div>
+        <div id="level-badge" style="color: #777; font-size: 0.9rem;">المستوى الاحترافي</div>
+        <div class="stat-hearts" id="hearts-display">❤️❤️❤️</div>
+    </div>
+
+    <!-- شاشة الإعدادات -->
+    <div id="setup-screen" class="screen active">
+        <h1>🌍 LinguaQuest Pro</h1>
+        <p class="subtitle">بنك المعلومات والكلمات الشامل للغات الخمس!</p>
+
+        <div class="form-group">
+            <label>لغتك الأم:</label>
+            <select id="native-lang">
+                <option value="ar" selected>🇸🇦 العربية</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="de">🇩🇪 Deutsch</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>اللغة المراد تعلمها:</label>
+            <select id="target-lang">
+                <option value="en" selected>🇬🇧 English (الإنجليزية)</option>
+                <option value="fr">🇫🇷 Français (الفرنسية)</option>
+                <option value="es">🇪🇸 Español (الإسبانية)</option>
+                <option value="de">🇩🇪 Deutsch (الألمانية)</option>
+                <option value="ar">🇸🇦 العربية</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>اختر مستوى التحدي:</label>
+            <select id="category-select">
+                <option value="basics" selected>🔥 المستوى 1: الأساسيات والتحيات الشاملة</option>
+                <option value="travel">✈️ المستوى 2: السفر والمطار والفنادق</option>
+                <option value="business">💼 المستوى 3: العمل والمحترفين والتكنولوجيا</option>
+                <option value="emotions">🧠 المستوى 4: المشاعر والحياة اليومية</option>
+            </select>
+        </div>
+
+        <button class="btn" onclick="startGame()">ابدأ بنك التحديات 🚀</button>
+    </div>
+
+    <!-- شاشة الأسئلة -->
+    <div id="quiz-screen" class="screen">
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="question-box">
+            <div style="color: #888; font-size: 0.9rem;">استمع للفظ الصحيح ثم اختر المعنى:</div>
+            <div class="target-word" id="word-display">Hello</div>
+            <button class="speak-btn" onclick="playAudioPronunciation()">🔊 استمع للفظ الصحيح</button>
+        </div>
+
+        <div class="options-grid" id="options-container"></div>
+        <div class="feedback-msg" id="feedback-msg"></div>
+    </div>
+
+    <!-- شاشة النهاية -->
+    <div id="result-screen" class="screen">
+        <div class="result-box">
+            <div class="result-emoji" id="result-emoji">🏆</div>
+            <h2 id="result-title">أداء خارق!</h2>
+            <p id="result-desc" style="margin: 15px 0; color: #666;"></p>
+            <button class="btn" onclick="resetToMenu()">العودة للقائمة الرئيسية</button>
+            <button class="btn btn-secondary" id="reward-btn" style="display:none;" onclick="watchAdForHeart()">🎬 شاهد إعلان لاستعادة قلب (+1 ❤️)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // بنك معلومات ضخم جداً ومتنوع للغات الخمس (العربية، الإنجليزية، الفرنسية، الإسبانية، الألمانية)
+    const curriculum = {
+        basics: [
+            { ar: "مرحباً بك", en: "Welcome", fr: "Bienvenue", es: "Bienvenido", de: "Willkommen" },
+            { ar: "صباح الخير", en: "Good morning", fr: "Bonjour", es: "Buenos días", de: "Guten Morgen" },
+            { ar: "مساء الخير", en: "Good evening", fr: "Bonsoir", es: "Buenas tardes", de: "Guten Abend" },
+            { ar: "كيف حالك اليوم؟", en: "How are you today?", fr: "Comment ça va aujourd'hui ?", es: "¿Cómo estás hoy?", de: "Wie geht es dir heute?" },
+            { ar: "أنا بخير، شكراً لك", en: "I am fine, thank you", fr: "Je vais bien, merci", es: "Estoy bien, gracias", de: "Mir geht es gut, danke" },
+            { ar: "ما اسمك؟", en: "What is your name?", fr: "Comment vous appelez-vous ?", es: "¿Cómo te llamas?", de: "Wie heißt du?" },
+            { ar: "تشرفت بمعرفتك", en: "Nice to meet you", fr: "Enchanté de faire votre connaissance", es: "Mucho gusto en conocerte", de: "Freut mich, dich kennenzulernen" },
+            { ar: "إلى اللقاء غداً", en: "See you tomorrow", fr: "À demain", es: "Hasta mañana", de: "Bis morgen" },
+            { ar: "مع السلامة", en: "Goodbye", fr: "Au revoir", es: "Adiós", de: "Auf Wiedersehen" },
+            { ar: "نعم، أوافق", en: "Yes, I agree", fr: "Oui, je suis d'accord", es: "Sí, estoy de acuerdo", de: "Ja, ich stimme zu" },
+            { ar: "لا، شكراً لك", en: "No, thank you", fr: "Non, merci", es: "No, gracias", de: "Nein, danke" },
+            { ar: "من فضلك", en: "Please", fr: "S'il vous plaît", es: "Por favor", de: "Bitte" }
+        ],
+        travel: [
+            { ar: "أين تقع محطة القطار؟", en: "Where is the train station?", fr: "Où est la gare ?", es: "¿Dónde está la estación de tren?", de: "Wo ist der Bahnhof?" },
+            { ar: "أريد حجز غرفة إضافية", en: "I want to book an extra room", fr: "Je veux réserver une chambre supplémentaire", es: "Quiero reservar una habitación extra", de: "Ich möchte ein zusätzliches Zimmer buchen" },
+            { ar: "كم تبلغ تكلفة التذكرة؟", en: "How much is the ticket?", fr: "Combien coûte le billet ?", es: "¿Cuánto cuesta el boleto?", de: "Wie viel kostet das Ticket?" },
+            { ar: "حقائبي ضاعت في المطار", en: "My luggage is lost at the airport", fr: "Mes bagages sont perdus à l'aéroport", es: "Mi equipaje se ha perdido en el aeropuerto", de: "Mein Gepäck ist am Flughafen verloren gegangen" },
+            { ar: "هل توجد طائرة مباشرة؟", en: "Is there a direct flight?", fr: "Y a-t-il un vol direct ?", es: "¿Hay un vuelo directo?", de: "Gibt es einen Direktflug?" },
+            { ar: "أين أقرب صراف آلي؟", en: "Where is the nearest ATM?", fr: "Où est le distributeur automatique le plus proche ?", es: "¿Dónde está el cajero automático más cercano?", de: "Wo ist der nächste Geldautomat?" },
+            { ar: "أريد تذكرة ذهاب وإياب", en: "I want a round-trip ticket", fr: "Je veux un billet aller-retour", es: "Quiero un boleto de ida y vuelta", de: "Ich möchte ein Hin- und Rückfahrtticket" },
+            { ar: "ما هو كلمة المرور للواي فاي؟", en: "What is the Wi-Fi password?", fr: "Quel est le mot de passe du Wi-Fi ?", es: "¿Cuál es la contraseña del Wi-Fi?", de: "Wie ist das WLAN-Passwort?" }
+        ],
+        business: [
+            { ar: "لقد وقعنا عقداً ناجحاً", en: "We signed a successful contract", fr: "Nous avons signé un contrat réussi", es: "Firmamos un contrato exitoso", de: "Wir haben einen erfolgreichen Vertrag unterzeichnet" },
+            { ar: "اجتماعنا القادم غداً صباحاً", en: "Our next meeting is tomorrow morning", fr: "Notre prochaine réunion est demain matin", es: "Nuestra próxima reunión es mañana por la mañana", de: "Unser Nächstes Treffen ist morgen früh" },
+            { ar: "نحتاج إلى تحليل قاعدة البيانات", en: "We need to analyze the database", fr: "Nous devons analyser la base de données", es: "Necesitamos analizar la base de datos", de: "Wir müssen die Datenbank analysieren" },
+            { ar: "تطوير تطبيق الهاتف المحمول", en: "Developing the mobile application", fr: "Développement de l'application mobile", es: "Desarrollo de la aplicación móvil", de: "Entwicklung der mobilen Anwendung" },
+            { ar: "زيادة الأرباح الشهرية", en: "Increasing monthly profits", fr: "Augmentation des bénéfices mensuels", es: "Aumento de las ganancias mensuales", de: "Steigerung des monatlichen Gewinns" },
+            { ar: "إدارة فريق العمل بكفاءة", en: "Managing the work team efficiently", fr: "Gérer l'équipe de travail efficacement", es: "Gestionar el equipo de trabajo de manera eficiente", de: "Das Arbeitsteam effizient managen" }
+        ],
+        emotions: [
+            { ar: "أنا متحمس جداً لهذا المشروع", en: "I am very excited about this project", fr: "Je suis très excité par ce projet", es: "Estoy muy emocionado por este proyecto", de: "Ich freue mich sehr auf dieses Projekt" },
+            { ar: "لا تقلق، كل شيء تحت السيطرة", en: "Don't worry, everything is under control", fr: "Ne vous inquiétez pas, tout est sous contrôle", es: "No te preocupes, todo está bajo control", de: "Keine Sorge, alles ist unter Kontrolle" },
+            { ar: "هذا أمر مذهل حقاً!", en: "This is truly amazing!", fr: "C'est vraiment incroyable !", es: "¡Esto es verdaderamente increíble!", de: "Das ist wirklich erstaunlich!" },
+            { ar: "أنا سعيد برؤيتك اليوم", en: "I am happy to see you today", fr: "Je suis heureux de vous voir aujourd'hui", es: "Me alegra verte hoy", de: "Ich freue mich, dich heute zu sehen" },
+            { ar: "أحتاج إلى بعض القهوة", en: "I need some coffee", fr: "J'ai besoin d'un peu de café", es: "Necesito un poco de café", de: "Ich brauche etwas Kaffee" },
+            { ar: "الوقت يناسبني تماماً", en: "The time suits me perfectly", fr: "L'heure me convient parfaitement", es: "El tiempo me conviene perfectamente", de: "Die Zeit passt perfekt für mich" }
+        ]
+    };
+
+    let nativeLang = 'ar';
+    let targetLang = 'en';
+    let currentCategory = 'basics';
+    let questions = [];
+    let currentIndex = 0;
+    let xp = 0;
+    let hearts = 3;
+    let canAnswer = true;
+
+    function playAudioPronunciation() {
+        const currentQ = questions[currentIndex];
+        const textToSpeak = currentQ[targetLang] || currentQ.en;
+        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(textToSpeak)}&tl=${targetLang}&client=tw-ob`;
+        const audio = new Audio(audioUrl);
+        audio.play().catch(e => {
+            alert("تعذر تشغيل الصوت، يرجى التأكد من الاتصال بالإنترنت.");
+        });
+    }
+
+    function playBeep(freq, duration, type = 'sine') {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+        } catch(e) {}
+    }
+
+    function playSuccessSound() {
+        playBeep(587.33, 0.15);
+        setTimeout(() => playBeep(880, 0.25), 150);
+    }
+
+    function playErrorSound() {
+        playBeep(200, 0.3, 'sawtooth');
+    }
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function updateStats() {
+        document.getElementById('xp-count').innerText = xp;
+        document.getElementById('hearts-display').innerText = '❤️'.repeat(hearts) + '🖤'.repeat(3 - hearts);
+    }
+
+    function startGame() {
+        const nativeEl = document.getElementById('native-lang');
+        const targetEl = document.getElementById('target-lang');
+        const catEl = document.getElementById('category-select');
+
+        nativeLang = nativeEl ? nativeEl.value : 'ar';
+        targetLang = targetEl ? targetEl.value : 'en';
+        currentCategory = catEl ? catEl.value : 'basics';
+
+        if (nativeLang === targetLang) {
+            targetLang = (nativeLang === 'ar') ? 'en' : 'ar';
+        }
+
+        hearts = 3;
+        currentIndex = 0;
+        // خلط الأسئلة عشوائياً لضمان تنوع غير محدود في كل مرة تلعب فيها
+        questions = [...(curriculum[currentCategory] || curriculum.basics)].sort(() => Math.random() - 0.5);
+        updateStats();
+        switchScreen('quiz-screen');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        canAnswer = true;
+        document.getElementById('feedback-msg').innerText = '';
+        
+        const progress = (currentIndex / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = progress + '%';
+
+        const currentQ = questions[currentIndex];
+        const wordEl = document.getElementById('word-display');
+        wordEl.innerText = currentQ[targetLang] || currentQ.en;
+        wordEl.style.direction = targetLang === 'ar' ? 'rtl' : 'ltr';
+
+        setTimeout(() => playAudioPronunciation(), 400);
+
+        const allItems = curriculum[currentCategory] || curriculum.basics;
+        let distractors = allItems
+            .filter(item => item[nativeLang] !== currentQ[nativeLang])
+            .map(item => item[nativeLang])
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3);
+
+        let options = [...distractors, currentQ[nativeLang]].sort(() => Math.random() - 0.5);
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt === currentQ[nativeLang], currentQ[nativeLang]);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(btn, isCorrect, correctAnswer) {
+        if (!canAnswer) return;
+        canAnswer = false;
+
+        const feedback = document.getElementById('feedback-msg');
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            playSuccessSound();
+            xp += 15;
+            feedback.style.color = 'var(--primary-dark)';
+            feedback.innerText = '✅ أحسنت! إجابة صحيحة (+15 XP)';
+        } else {
+            btn.classList.add('wrong');
+            playErrorSound();
+            hearts--;
+            feedback.style.color = 'var(--danger)';
+            feedback.innerText = '❌ خطأ! الصحيح: ' + correctAnswer;
+        }
+
+        updateStats();
+
+        setTimeout(() => {
+            if (hearts <= 0) {
+                endGame(false);
+            } else if (currentIndex + 1 < questions.length) {
+                currentIndex++;
+                loadQuestion();
+            } else {
+                endGame(true);
+            }
+        }, 1800);
+    }
+
+    function endGame(won) {
+        document.getElementById('progress-bar').style.width = '100%';
+        switchScreen('result-screen');
+        const rewardBtn = document.getElementById('reward-btn');
+
+        if (won) {
+            document.getElementById('result-emoji').innerText = '🏆';
+            document.getElementById('result-title').innerText = 'مذهل! أتممت بنك المعلومات باحترافية';
+            document.getElementById('result-desc').innerText = `رصيدك الإجمالي الآن: ${xp} نقطة خبرة (XP)`;
+            playSuccessSound();
+            rewardBtn.style.display = 'none';
+        } else {
+            document.getElementById('result-emoji').innerText = '💔';
+            document.getElementById('result-title').innerText = 'انتهت قلوبك!';
+            document.getElementById('result-desc').innerText = 'شاهد إعلاناً قصيراً لاستعادة طاقتك والمتابعة.';
+            playErrorSound();
+            rewardBtn.style.display = 'block';
+        }
+    }
+
+    function watchAdForHeart() {
+        alert("🎬 [محاكاة الإعلان]: تم عرض فيديو قصير بنجاح! تم استعادة قلبك.");
+        hearts = 1;
+        updateStats();
+        switchScreen('quiz-screen');
+        loadQuestion();
+    }
+
+    function resetToMenu() {
+        switchScreen('setup-screen');
+    }
+</script>
+
+</body>
+</html>
