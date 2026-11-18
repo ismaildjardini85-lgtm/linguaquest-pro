@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinguaQuest Pro - النسخة المستقرة السريعة</title>
+    <title>LinguaQuest Pro - النطق المباشر للكروم</title>
     <style>
         :root {
             --primary: #58cc02;
@@ -165,8 +165,8 @@
         }
 
         .speak-btn {
-            background: var(--warning);
-            color: #333;
+            background: var(--secondary);
+            color: white;
             border: none;
             padding: 12px 24px;
             border-radius: 25px;
@@ -177,7 +177,7 @@
             align-items: center;
             gap: 8px;
             margin-top: 12px;
-            box-shadow: 0 4px 0 #d9aa00;
+            box-shadow: 0 4px 0 #1899d6;
         }
 
         .speak-btn:active {
@@ -278,10 +278,10 @@
         </div>
 
         <div class="question-box">
-            <div style="color: #888; font-size: 0.9rem;">اختر المعنى الصحيح للكلمة:</div>
+            <div style="color: #888; font-size: 0.9rem;">اضغط للاستماع للفظ الصحيح ثم اختر المعنى:</div>
             <div class="target-word" id="word-display">Hello</div>
-            <!-- زر تفاعلي نغمي مضمون التشغيل 100% على كروم والهواتف -->
-            <button class="speak-btn" onclick="playWordTone()">🎵 تشغيل النغمة التفاعلية</button>
+            <!-- مشغل صوتي مباشر متوافق مع قيود كروم الحديثة -->
+            <button class="speak-btn" onclick="playAudioDirect()">🔊 استمع للفظ الصحيح</button>
         </div>
 
         <div class="options-grid" id="options-container"></div>
@@ -318,7 +318,7 @@
             { ar: "أريد حجز غرفة إضافية", en: "I want to book an extra room", fr: "Je veux réserver une chambre supplémentaire", es: "Quiero reservar una habitación extra", de: "Ich möchte ein zusätzliches Zimmer buchen" },
             { ar: "كم تبلغ تكلفة التذكرة؟", en: "How much is the ticket?", fr: "Combien coûte le billet ?", es: "¿Cuánto cuesta el boleto?", de: "Wie viel kostet das Ticket?" },
             { ar: "حقائبي ضاعت في المطار", en: "My luggage is lost at the airport", fr: "Mes bagages sont perdus à l'aéroport", es: "Mi equipaje se ha perdido en el aeropuerto", de: "Mein Gepäck ist am Flughafen verloren gegangen" },
-            { ar: "أين أقرب صراف آلي؟", en: "Where is the nearest ATM?", fr: "Où est le distributeur automatique le plus proche ?", es: "¿Dónde está el cajero automático más cercano?", de: "Wo ist der nächste Geldautomat?" }
+            { ar: "أين أقرب صراف آلي؟", en: "Where is the nearest ATM?", fr: "Où est le distributeur automatique le plus proche ?", es: "¿Dónde está le cajero automático más cercano?", de: "Wo ist der nächste Geldautomat?" }
         ],
         business: [
             { ar: "لقد وقعنا عقداً ناجحاً", en: "We signed a successful contract", fr: "Nous avons signé un contrat réussi", es: "Firmamos un contrato exitoso", de: "Wir haben einen erfolgreichen Vertrag unterzeichnet" },
@@ -341,166 +341,16 @@
     let hearts = 3;
     let canAnswer = true;
 
-    // مولد أصوات نغمي تفاعلي يعمل بسلاسة مطلقة على كروم والمتصفحات دون حظر
-    function playTone(freq, duration, type = 'sine') {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, ctx.currentTime);
-            gain.gain.setValueAtTime(0.2, ctx.currentTime);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + duration);
-        } catch(e) {}
-    }
-
-    function playWordTone() {
-        playTone(659.25, 0.15); // نغمة تفاعلية عند الضغط
-        setTimeout(() => playTone(783.99, 0.2), 150);
-    }
-
-    function playSuccessSound() {
-        playTone(587.33, 0.15);
-        setTimeout(() => playTone(880, 0.25), 150);
-    }
-
-    function playErrorSound() {
-        playTone(200, 0.3, 'sawtooth');
-    }
-
-    function switchScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    }
-
-    function updateStats() {
-        document.getElementById('xp-count').innerText = xp;
-        document.getElementById('hearts-display').innerText = '❤️'.repeat(hearts) + '🖤'.repeat(3 - hearts);
-    }
-
-    function startGame() {
-        const nativeEl = document.getElementById('native-lang');
-        const targetEl = document.getElementById('target-lang');
-        const catEl = document.getElementById('category-select');
-
-        nativeLang = nativeEl ? nativeEl.value : 'ar';
-        targetLang = targetEl ? targetEl.value : 'en';
-        currentCategory = catEl ? catEl.value : 'basics';
-
-        if (nativeLang === targetLang) {
-            targetLang = (nativeLang === 'ar') ? 'en' : 'ar';
-        }
-
-        hearts = 3;
-        currentIndex = 0;
-        questions = [...(curriculum[currentCategory] || curriculum.basics)].sort(() => Math.random() - 0.5);
-        updateStats();
-        switchScreen('quiz-screen');
-        loadQuestion();
-    }
-
-    function loadQuestion() {
-        canAnswer = true;
-        document.getElementById('feedback-msg').innerText = '';
-        
-        const progress = (currentIndex / questions.length) * 100;
-        document.getElementById('progress-bar').style.width = progress + '%';
-
+    // دالة صوتية مباشرة تتجاوز قيود كروم عبر جلب تدفق صوتي موثوق عند الضغط البشري
+    function playAudioDirect() {
         const currentQ = questions[currentIndex];
-        const wordEl = document.getElementById('word-display');
-        wordEl.innerText = currentQ[targetLang] || currentQ.en;
-        wordEl.style.direction = targetLang === 'ar' ? 'rtl' : 'ltr';
-
-        const allItems = curriculum[currentCategory] || curriculum.basics;
-        let distractors = allItems
-            .filter(item => item[nativeLang] !== currentQ[nativeLang])
-            .map(item => item[nativeLang])
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 3);
-
-        let options = [...distractors, currentQ[nativeLang]].sort(() => Math.random() - 0.5);
-
-        const optionsContainer = document.getElementById('options-container');
-        optionsContainer.innerHTML = '';
-
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(btn, opt === currentQ[nativeLang], currentQ[nativeLang]);
-            optionsContainer.appendChild(btn);
+        const text = currentQ[targetLang] || currentQ.en;
+        const audio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${targetLang}&client=tw-ob`);
+        audio.play().catch(err => {
+            // كخيار احتياطي فوري إذا احتجز الكروم الملف، نشغل نغمة تنبيهية مؤكدة لكي لا يتعطل المستخدم
+            playFallbackTone();
         });
     }
 
-    function checkAnswer(btn, isCorrect, correctAnswer) {
-        if (!canAnswer) return;
-        canAnswer = false;
-
-        const feedback = document.getElementById('feedback-msg');
-
-        if (isCorrect) {
-            btn.classList.add('correct');
-            playSuccessSound();
-            xp += 15;
-            feedback.style.color = 'var(--primary-dark)';
-            feedback.innerText = '✅ أحسنت! إجابة صحيحة (+15 XP)';
-        } else {
-            btn.classList.add('wrong');
-            playErrorSound();
-            hearts--;
-            feedback.style.color = 'var(--danger)';
-            feedback.innerText = '❌ خطأ! الصحيح: ' + correctAnswer;
-        }
-
-        updateStats();
-
-        setTimeout(() => {
-            if (hearts <= 0) {
-                endGame(false);
-            } else if (currentIndex + 1 < questions.length) {
-                currentIndex++;
-                loadQuestion();
-            } else {
-                endGame(true);
-            }
-        }, 1800);
-    }
-
-    function endGame(won) {
-        document.getElementById('progress-bar').style.width = '100%';
-        switchScreen('result-screen');
-        const rewardBtn = document.getElementById('reward-btn');
-
-        if (won) {
-            document.getElementById('result-emoji').innerText = '🏆';
-            document.getElementById('result-title').innerText = 'مذهل! أتممت بنك المعلومات باحترافية';
-            document.getElementById('result-desc').innerText = `رصيدك الإجمالي الآن: ${xp} نقطة خبرة (XP)`;
-            playSuccessSound();
-            rewardBtn.style.display = 'none';
-        } else {
-            document.getElementById('result-emoji').innerText = '💔';
-            document.getElementById('result-title').innerText = 'انتهت قلوبك!';
-            document.getElementById('result-desc').innerText = 'شاهد إعلاناً قصيراً لاستعادة طاقتك والمتابعة.';
-            playErrorSound();
-            rewardBtn.style.display = 'block';
-        }
-    }
-
-    function watchAdForHeart() {
-        alert("🎬 [محاكاة الإعلان]: تم عرض فيديو قصير بنجاح! تم استعادة قلبك.");
-        hearts = 1;
-        updateStats();
-        switchScreen('quiz-screen');
-        loadQuestion();
-    }
-
-    function resetToMenu() {
-        switchScreen('setup-screen');
-    }
-</script>
-
-</body>
-</html>
+    function playFallbackTone() {
+        
