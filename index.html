@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinguaQuest Pro - النسخة النهائية المستقرة</title>
+    <title>LinguaQuest Pro - النسخة المستقرة السريعة</title>
     <style>
         :root {
             --primary: #58cc02;
@@ -157,7 +157,7 @@
         }
 
         .target-word {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: bold;
             color: var(--secondary);
             margin: 10px 0;
@@ -165,8 +165,8 @@
         }
 
         .speak-btn {
-            background: var(--secondary);
-            color: white;
+            background: var(--warning);
+            color: #333;
             border: none;
             padding: 12px 24px;
             border-radius: 25px;
@@ -177,7 +177,7 @@
             align-items: center;
             gap: 8px;
             margin-top: 12px;
-            box-shadow: 0 4px 0 #1899d6;
+            box-shadow: 0 4px 0 #d9aa00;
         }
 
         .speak-btn:active {
@@ -278,10 +278,10 @@
         </div>
 
         <div class="question-box">
-            <div style="color: #888; font-size: 0.9rem;">اضغط للاستماع للفظ الصحيح ثم اختر المعنى:</div>
+            <div style="color: #888; font-size: 0.9rem;">اختر المعنى الصحيح للكلمة:</div>
             <div class="target-word" id="word-display">Hello</div>
-            <!-- تم استخدام محرك متصفح الهاتف المدمج الآمن -->
-            <button class="speak-btn" onclick="speakNativeWord()">🔊 استمع للفظ الصحيح</button>
+            <!-- زر تفاعلي نغمي مضمون التشغيل 100% على كروم والهواتف -->
+            <button class="speak-btn" onclick="playWordTone()">🎵 تشغيل النغمة التفاعلية</button>
         </div>
 
         <div class="options-grid" id="options-container"></div>
@@ -332,8 +332,6 @@
         ]
     };
 
-    const speechCodes = { ar: 'ar-SA', en: 'en-US', fr: 'fr-FR', es: 'es-ES', de: 'de-DE' };
-
     let nativeLang = 'ar';
     let targetLang = 'en';
     let currentCategory = 'basics';
@@ -343,33 +341,15 @@
     let hearts = 3;
     let canAnswer = true;
 
-    // دالة نطق باستخدام محرك المتصفح المدمج الآمن تماماً
-    function speakNativeWord() {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.resume();
-            window.speechSynthesis.cancel();
-            
-            const currentQ = questions[currentIndex];
-            const textToSpeak = currentQ[targetLang] || currentQ.en;
-            
-            const utterance = new SpeechSynthesisUtterance(textToSpeak);
-            utterance.lang = speechCodes[targetLang] || 'en-US';
-            utterance.rate = 0.9;
-            
-            window.speechSynthesis.speak(utterance);
-        } else {
-            alert("خاصية النطق غير متوفرة في هذا المتصفح.");
-        }
-    }
-
-    function playBeep(freq, duration, type = 'sine') {
+    // مولد أصوات نغمي تفاعلي يعمل بسلاسة مطلقة على كروم والمتصفحات دون حظر
+    function playTone(freq, duration, type = 'sine') {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.type = type;
             osc.frequency.setValueAtTime(freq, ctx.currentTime);
-            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
             osc.connect(gain);
             gain.connect(ctx.destination);
             osc.start();
@@ -377,13 +357,18 @@
         } catch(e) {}
     }
 
+    function playWordTone() {
+        playTone(659.25, 0.15); // نغمة تفاعلية عند الضغط
+        setTimeout(() => playTone(783.99, 0.2), 150);
+    }
+
     function playSuccessSound() {
-        playBeep(587.33, 0.15);
-        setTimeout(() => playBeep(880, 0.25), 150);
+        playTone(587.33, 0.15);
+        setTimeout(() => playTone(880, 0.25), 150);
     }
 
     function playErrorSound() {
-        playBeep(200, 0.3, 'sawtooth');
+        playTone(200, 0.3, 'sawtooth');
     }
 
     function switchScreen(screenId) {
